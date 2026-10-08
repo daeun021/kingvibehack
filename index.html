@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>이다은 바이브코딩 해커톤</title>
-  <!-- Tailwind CSS for modern responsive visual layout -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Phosphor Icons for UI controls -->
+  <!-- Phosphor Icons -->
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <style>
     * { box-sizing: border-box; touch-action: manipulation; }
@@ -129,15 +129,15 @@
       </div>
     </header>
 
-    <!-- Score Dashboard -->
-    <section class="grid grid-cols-5 gap-2 mb-3 bg-[#f3f5f1] p-2.5 rounded-xl border border-[#d8ded7] text-center font-bold">
-      <div class="p-1">
-        <span class="text-xs text-gray-500 block uppercase">점수</span>
-        <span id="score-val" class="text-lg sm:text-2xl text-[#00462a]">0</span>
-      </div>
+    <!-- Score Dashboard (5칸으로 변경) -->
+    <section class="grid grid-cols-5 gap-1 sm:gap-2 mb-3 bg-[#f3f5f1] p-2.5 rounded-xl border border-[#d8ded7] text-center font-bold">
       <div class="p-1">
         <span class="text-xs text-gray-500 block uppercase">시간</span>
         <span id="time-val" class="text-lg sm:text-2xl text-blue-600">30s</span>
+      </div>
+      <div class="p-1">
+        <span class="text-xs text-gray-500 block uppercase">점수</span>
+        <span id="score-val" class="text-lg sm:text-2xl text-[#00462a]">0</span>
       </div>
       <div class="p-1">
         <span class="text-xs text-gray-500 block uppercase">콤보</span>
@@ -164,7 +164,7 @@
         <div class="text-5xl mb-3">🙋‍♂️📱</div>
         <h2 class="text-2xl sm:text-3xl font-bold text-[#00462a] mb-2">폰을 떨어트렸다!</h2>
         <p class="text-gray-600 text-sm sm:text-base max-w-md mb-6 leading-relaxed">
-          두 팔을 벌린 사람을 조작해 스마트폰을 주우세요!<br>
+          <b>30초</b> 동안 스마트폰을대한 많이 주우세요!<br>
           ⏰ <b>시계</b>를 주의하고, 💥 <b>고장난 폰</b>을 피하세요!
         </p>
         <button id="overlay-start-btn" class="btn-primary px-8 py-3.5 rounded-xl font-bold text-lg shadow-lg hover:scale-105 active:scale-95">
@@ -193,7 +193,7 @@
           </div>
           <div class="flex justify-between border-t border-gray-100 pt-1 text-red-600 font-semibold" id="fail-reason-row">
             <span>종료 사유:</span>
-            <span id="fail-reason">체력 소진</span>
+            <span id="fail-reason">시간 초과</span>
           </div>
         </div>
 
@@ -247,7 +247,7 @@
     <!-- Rule & Guide Section -->
     <section class="guide mt-6 p-5 border border-[#d8ded7] rounded-xl bg-[#f8faf6] text-sm">
       <h2 class="font-bold text-lg text-[#00462a] mb-2 flex items-center gap-2">
-        <i class="ph ph-info"></i> 게임 규칙 & 업데이트 아이템 안내
+        <i class="ph ph-info"></i> 게임 규칙 & 안내 (제한시간 30초)
       </h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-gray-700">
         <ul class="space-y-1.5 list-disc list-inside">
@@ -265,7 +265,6 @@
   </main>
 
   <script>
-    // Web Audio Synthesizer for procedural SFX
     class SoundEngine {
       constructor() {
         this.ctx = null;
@@ -290,8 +289,8 @@
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(523.25, this.ctx.currentTime); // C5
-        osc.frequency.exponentialRampToValueAtTime(880, this.ctx.currentTime + 0.1); // A5
+        osc.frequency.setValueAtTime(523.25, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(880, this.ctx.currentTime + 0.1);
 
         gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.1);
@@ -390,6 +389,7 @@
     const ctx = canvas.getContext('2d');
     const canvasWrapper = document.getElementById('canvas-wrapper');
 
+    const timeVal = document.getElementById('time-val');
     const scoreVal = document.getElementById('score-val');
     const comboVal = document.getElementById('combo-val');
     const highscoreVal = document.getElementById('highscore-val');
@@ -410,6 +410,7 @@
     const STATE = { IDLE: 0, PLAYING: 1, PAUSED: 2, GAMEOVER: 3 };
     let gameState = STATE.IDLE;
 
+    let gameTime = 30; // ⏱️ 총 제한시간 (30초)
     let score = 0;
     let combo = 0;
     let maxCombo = 0;
@@ -425,24 +426,19 @@
     let fastMotionTimeLeft = 0;
     let failReasonText = '체력 소진';
 
-    const timeVal = document.getElementById('time-val');
-    let gameTime = 30; // 제한 시간 30초
-
     const keys = { left: false, right: false };
 
-    // Human player state
     const player = {
       x: 0,
       y: 0,
-      width: 64,   // width of arms outstretched catch zone
-      height: 72,  // human character height
+      width: 64,
+      height: 72,
       speed: 550,
-      facing: 'center', // 'left', 'right', 'center'
+      facing: 'center',
       animFrame: 0,
       glow: 0
     };
 
-    // Falling Item Specifications
     const ITEM_TYPES = {
       PHONE: { type: 'PHONE', emoji: '📱', score: 10, weight: 55, speed: 300, isHazard: false },
       GOLDEN: { type: 'GOLDEN', emoji: '✨', score: 30, weight: 15, speed: 500, isHazard: false },
@@ -460,27 +456,18 @@
         const angle = Math.random() * Math.PI * 2;
         const speed = Math.random() * 140 + 40;
         particles.push({
-          x: x,
-          y: y,
+          x: x, y: y,
           vx: Math.cos(angle) * speed,
           vy: Math.sin(angle) * speed,
           radius: Math.random() * 4 + 2,
-          color: color,
-          alpha: 1,
-          life: 0.5
+          color: color, alpha: 1, life: 0.5
         });
       }
     }
 
     function createFloatingText(x, y, text, color = '#00462a') {
       floatingTexts.push({
-        x: x,
-        y: y,
-        text: text,
-        color: color,
-        alpha: 1,
-        vy: -70,
-        life: 0.95
+        x: x, y: y, text: text, color: color, alpha: 1, vy: -70, life: 0.95
       });
     }
 
@@ -505,7 +492,6 @@
 
     window.addEventListener('resize', resizeCanvas);
 
-    // Keyboard controls
     window.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = true;
       if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = true;
@@ -520,7 +506,6 @@
       if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = false;
     });
 
-    // Mouse / Touch direct tracking
     function handlePointerMove(clientX) {
       if (gameState !== STATE.PLAYING) return;
       const rect = canvasWrapper.getBoundingClientRect();
@@ -539,7 +524,6 @@
       if (e.touches.length > 0) handlePointerMove(e.touches[0].clientX);
     }, { passive: true });
 
-    // Touch Buttons
     const btnTouchLeft = document.getElementById('touch-left');
     const btnTouchRight = document.getElementById('touch-right');
 
@@ -582,116 +566,109 @@
     }
 
     function update(dt) {
-      if (gameState !== STATE.PLAYING) return;
+  if (gameState !== STATE.PLAYING) return;
 
-      const rect = canvasWrapper.getBoundingClientRect();
+  // ⏱️ 제한시간 카운트다운
+  gameTime -= dt;
+  if (gameTime <= 0) {
+    gameTime = 0;
+    timeVal.textContent = '0s';
+    failReasonText = '30초 제한시간 종료! ⏱️';
+    gameOver();
+    return;
+  }
+  timeVal.textContent = `${Math.ceil(gameTime)}s`;
 
-      gameTime -= dt;
-      if (gameTime <= 0) {
-        gameTime = 0;
-        timeVal.textContent = '0s';
-        failReasonText = '30초 제한시간 종료! ⏱️';
-        gameOver();
-        return;
-      }
-      timeVal.textContent = `${Math.ceil(gameTime)}s`;
+  const rect = canvasWrapper.getBoundingClientRect();
 
-      // Determine active game speed (Fast Motion vs normal speed ramping)
-      let currentSpeedMultiplier = 1 + Math.min(score / 350, 0.8);
-      if (fastMotionTimeLeft > 0) {
-        fastMotionTimeLeft -= dt;
-        currentSpeedMultiplier *= 1.3; // 1.8x Fast Motion speed!
-      }
+  let currentSpeedMultiplier = 1 + Math.min(score / 350, 0.8);
+  if (fastMotionTimeLeft > 0) {
+    fastMotionTimeLeft -= dt;
+    currentSpeedMultiplier *= 1.3;
+  }
 
-      // Player Controls & Facing direction
-      if (keys.left) {
-        player.x -= player.speed * dt;
-        player.facing = 'left';
-        player.animFrame += dt * 10;
-      } else if (keys.right) {
-        player.x += player.speed * dt;
-        player.facing = 'right';
-        player.animFrame += dt * 10;
-      } else {
-        player.facing = 'center';
-        player.animFrame = 0;
-      }
-      player.x = Math.max(0, Math.min(rect.width - player.width, player.x));
+  if (keys.left) {
+    player.x -= player.speed * dt;
+    player.facing = 'left';
+    player.animFrame += dt * 10;
+  } else if (keys.right) {
+    player.x += player.speed * dt;
+    player.facing = 'right';
+    player.animFrame += dt * 10;
+  } else {
+    player.facing = 'center';
+    player.animFrame = 0;
+  }
+  player.x = Math.max(0, Math.min(rect.width - player.width, player.x));
 
-      if (player.glow > 0) player.glow -= dt * 3;
+  if (player.glow > 0) player.glow -= dt * 3;
 
-      // Spawning loop
-      spawnTimer += dt * 1000;
-      const currentInterval = Math.max(300, spawnInterval / currentSpeedMultiplier);
-      if (spawnTimer >= currentInterval) {
-        spawnItem();
-        spawnTimer = 0;
-      }
+  spawnTimer += dt * 1000;
+  const currentInterval = Math.max(300, spawnInterval / currentSpeedMultiplier);
+  if (spawnTimer >= currentInterval) {
+    spawnItem();
+    spawnTimer = 0;
+  }
 
-      // Items movement & collisions
-      for (let i = items.length - 1; i >= 0; i--) {
-        const item = items[i];
-        const effectiveSpeed = item.speed * item.speedMultiplier * currentSpeedMultiplier;
-        item.y += effectiveSpeed * dt;
-        item.rotation += item.rotSpeed * dt;
+  for (let i = items.length - 1; i >= 0; i--) {
+    const item = items[i];
+    const effectiveSpeed = item.speed * item.speedMultiplier * currentSpeedMultiplier;
+    item.y += effectiveSpeed * dt;
+    item.rotation += item.rotSpeed * dt;
 
-        // Player catch hands collision box
-        const playerBox = {
-          left: player.x - 4,
-          right: player.x + player.width + 4,
-          top: player.y,
-          bottom: player.y + 35 // Catch hands height zone
-        };
+    const playerBox = {
+      left: player.x - 4,
+      right: player.x + player.width + 4,
+      top: player.y,
+      bottom: player.y + 35
+    };
 
-        const itemBox = {
-          left: item.x,
-          right: item.x + item.size,
-          top: item.y,
-          bottom: item.y + item.size
-        };
+    const itemBox = {
+      left: item.x,
+      right: item.x + item.size,
+      top: item.y,
+      bottom: item.y + item.size
+    };
 
-        const isColliding = (
-          itemBox.right >= playerBox.left &&
-          itemBox.left <= playerBox.right &&
-          itemBox.bottom >= playerBox.top &&
-          itemBox.top <= playerBox.bottom
-        );
+    const isColliding = (
+      itemBox.right >= playerBox.left &&
+      itemBox.left <= playerBox.right &&
+      itemBox.bottom >= playerBox.top &&
+      itemBox.top <= playerBox.bottom
+    );
 
-        if (isColliding) {
-          handleItemCatch(item);
-          items.splice(i, 1);
-          continue;
-        }
-
-        // Missed item reaches bottom
-        if (item.y > rect.height) {
-          if (!item.isHazard && item.type === 'PHONE') {
-            combo = 0;
-            updateComboUI();
-            takeDamage('휴대폰 놓침!');
-            sounds.playEarphonePenalty();
-          }
-          items.splice(i, 1);
-        }
-      }
-
-      // Update Particles
-      for (let i = particles.length - 1; i >= 0; i--) {
-        const p = particles[i];
-        p.x += p.vx * dt;
-        p.y += p.vy * dt;
-        p.alpha -= dt / p.life;
-        if (p.alpha <= 0) particles.splice(i, 1);
-      }
-
-      // Update Floating Texts
-      for (let i = floatingTexts.length - 1; i >= 0; i--) {
-        const ft = floatingTexts[i];
-        ft.y += ft.vy * dt;
-        ft.alpha -= dt / ft.life;
-        if (ft.alpha <= 0) floatingTexts.splice(i, 1);
-      }
+    if (isColliding) {
+      handleItemCatch(item);
+      items.splice(i, 1);
+      continue;
     }
+
+    if (item.y > rect.height) {
+      if (!item.isHazard && item.type === 'PHONE') {
+        combo = 0;
+        updateComboUI();
+        takeDamage('휴대폰 놓침!');
+        sounds.playEarphonePenalty();
+      }
+      items.splice(i, 1);
+    }
+  }
+
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    p.alpha -= dt / p.life;
+    if (p.alpha <= 0) particles.splice(i, 1);
+  }
+
+  for (let i = floatingTexts.length - 1; i >= 0; i--) {
+    const ft = floatingTexts[i];
+    ft.y += ft.vy * dt;
+    ft.alpha -= dt / ft.life;
+    if (ft.alpha <= 0) floatingTexts.splice(i, 1);
+  }
+}
 
     function handleItemCatch(item) {
       const centerX = item.x + item.size / 2;
@@ -699,7 +676,6 @@
 
       player.glow = 1;
 
-      // 1. Broken Phone -> INSTANT GAME OVER!
       if (item.instantDeath) {
         createParticles(centerX, centerY, '#dc2626', 20);
         createFloatingText(centerX, centerY, '고장난 폰! GAME OVER!', '#dc2626');
@@ -709,7 +685,6 @@
         return;
       }
 
-      // 2. Earphones -> Penalty
       if (item.type === 'EARPHONES') {
         combo = 0;
         updateComboUI();
@@ -722,9 +697,8 @@
         return;
       }
 
-      // 3. Clock -> Fast Motion
       if (item.type === 'CLOCK') {
-        fastMotionTimeLeft = 5.0; // 5 seconds of fast motion!
+        fastMotionTimeLeft = 5.0;
         score += item.score;
         scoreVal.textContent = score;
 
@@ -734,7 +708,6 @@
         return;
       }
 
-      // 4. Normal / Golden Phones
       caughtCount++;
       combo++;
       if (combo > maxCombo) maxCombo = combo;
@@ -802,35 +775,29 @@
       const isRight = player.facing === 'right';
       const legOffset = Math.sin(player.animFrame) * 6;
 
-      // Glow effect on catching
       if (player.glow > 0) {
         ctx.shadowColor = '#10b981';
         ctx.shadowBlur = 16 * player.glow;
       }
 
-      // Legs / Pants
       ctx.fillStyle = '#1e293b';
-      // Left leg
       ctx.beginPath();
       ctx.roundRect(-14, -22 + (isLeft ? legOffset : 0), 10, 22, 4);
       ctx.fill();
-      // Right leg
+
       ctx.beginPath();
       ctx.roundRect(4, -22 + (isRight ? -legOffset : 0), 10, 22, 4);
       ctx.fill();
 
-      // Shoes
       ctx.fillStyle = '#0f172a';
       ctx.fillRect(-16, -4 + (isLeft ? legOffset : 0), 12, 5);
       ctx.fillRect(4, -4 + (isRight ? -legOffset : 0), 12, 5);
 
-      // Shirt / Body
       ctx.fillStyle = '#00462a';
       ctx.beginPath();
       ctx.roundRect(-18, -50, 36, 30, 6);
       ctx.fill();
 
-      // Shirt collar accent
       ctx.fillStyle = '#ffffff';
       ctx.beginPath();
       ctx.moveTo(-6, -50);
@@ -838,50 +805,42 @@
       ctx.lineTo(6, -50);
       ctx.fill();
 
-      // Head
-      ctx.fillStyle = '#fde047'; // skin tone / warm tone
+      ctx.fillStyle = '#fde047';
       ctx.beginPath();
       ctx.arc(0, -62, 14, 0, Math.PI * 2);
       ctx.fill();
 
-      // Hair
       ctx.fillStyle = '#27272a';
       ctx.beginPath();
       ctx.arc(0, -66, 14, Math.PI, Math.PI * 2);
       ctx.fill();
 
-      // Eyes (looking UP at falling phones!)
       ctx.fillStyle = '#000000';
       ctx.beginPath();
       ctx.arc(-5, -65, 2.5, 0, Math.PI * 2);
       ctx.arc(5, -65, 2.5, 0, Math.PI * 2);
       ctx.fill();
 
-      // Open smile face
       ctx.strokeStyle = '#000000';
       ctx.lineWidth = 1.5;
       ctx.beginPath();
       ctx.arc(0, -60, 4, 0, Math.PI);
       ctx.stroke();
 
-      // Outstretched Arms (ready to catch)
       ctx.strokeStyle = '#00462a';
       ctx.lineWidth = 7;
       ctx.lineCap = 'round';
 
-      // Left Arm up
       ctx.beginPath();
       ctx.moveTo(-16, -44);
       ctx.lineTo(-28, -62);
       ctx.stroke();
 
-      // Right Arm up
       ctx.beginPath();
       ctx.moveTo(16, -44);
       ctx.lineTo(28, -62);
       ctx.stroke();
 
-      // Open Hands
       ctx.fillStyle = '#fde047';
       ctx.beginPath();
       ctx.arc(-29, -64, 5, 0, Math.PI * 2);
@@ -895,7 +854,6 @@
       const rect = canvasWrapper.getBoundingClientRect();
       ctx.clearRect(0, 0, rect.width, rect.height);
 
-      // Background Grid
       ctx.fillStyle = '#f3f5f1';
       ctx.fillRect(0, 0, rect.width, rect.height);
 
@@ -915,12 +873,10 @@
         ctx.stroke();
       }
 
-      // Fast Motion visual banner
       if (fastMotionTimeLeft > 0) {
         ctx.fillStyle = 'rgba(239, 68, 68, 0.08)';
         ctx.fillRect(0, 0, rect.width, rect.height);
 
-        // Speed Lines
         ctx.strokeStyle = 'rgba(239, 68, 68, 0.25)';
         ctx.lineWidth = 2;
         for (let i = 0; i < 5; i++) {
@@ -937,7 +893,6 @@
         ctx.fillText(`⚡ 패스트 모션! (${fastMotionTimeLeft.toFixed(1)}s)`, rect.width - 12, 24);
       }
 
-      // Draw Falling Items
       items.forEach(item => {
         ctx.save();
         ctx.translate(item.x + item.size / 2, item.y + item.size / 2);
@@ -964,7 +919,6 @@
         ctx.restore();
       });
 
-      // Draw Particles
       particles.forEach(p => {
         ctx.save();
         ctx.globalAlpha = Math.max(0, p.alpha);
@@ -975,7 +929,6 @@
         ctx.restore();
       });
 
-      // Draw Floating Text
       floatingTexts.forEach(ft => {
         ctx.save();
         ctx.globalAlpha = Math.max(0, ft.alpha);
@@ -986,55 +939,65 @@
         ctx.restore();
       });
 
-      // Draw Human Player Character
       drawHumanPlayer(player.x, player.y, player.width, player.height);
     }
 
     function gameLoop(timestamp) {
-      if (!lastTime) lastTime = timestamp;
-      const dt = Math.min((timestamp - lastTime) / 1000, 0.1);
-      lastTime = timestamp;
+      // 재시작 후 첫 프레임이면 lastTime을 현재 frame timestamp로 맞춤
+  if (!lastTime) lastTime = timestamp;
+  
+  let dt = (timestamp - lastTime) / 1000;
+  if (dt < 0 || isNaN(dt)) dt = 0; // 시간 음수 오차 방지
+  dt = Math.min(dt, 0.1); // 최대 dt 100ms 제한
+  lastTime = timestamp;
 
-      update(dt);
-      render();
+  update(dt);
+  render();
 
-      if (gameState === STATE.PLAYING) {
-        animFrameId = requestAnimationFrame(gameLoop);
-      }
-    }
+  if (gameState === STATE.PLAYING) {
+    animFrameId = requestAnimationFrame(gameLoop);
+  }
+}
 
     function startGame() {
-      sounds.init();
-      score = 0;
-      combo = 0;
-      maxCombo = 0;
-      caughtCount = 0;
-      lives = 3;
-      spawnTimer = 0;
-      fastMotionTimeLeft = 0;
-      items = [];
-      particles = [];
-      floatingTexts = [];
+  sounds.init();
+  
+  // ⏱️ 제한시간 및 게임 상태 초기화
+  gameTime = 30; 
+  score = 0;
+  combo = 0;
+  maxCombo = 0;
+  caughtCount = 0;
+  lives = 3;
+  spawnTimer = 0;
+  fastMotionTimeLeft = 0;
+  failReasonText = '체력 소진';
+  items = [];
+  particles = [];
+  floatingTexts = [];
 
-      scoreVal.textContent = '0';
-      comboVal.textContent = '0x';
-      renderLivesUI();
+  timeVal.textContent = '30s';
+  scoreVal.textContent = '0';
+  comboVal.textContent = '0x';
+  renderLivesUI();
 
-      gameState = STATE.PLAYING;
+  gameState = STATE.PLAYING;
 
-      startOverlay.classList.add('hidden');
-      gameoverOverlay.classList.add('hidden');
-      pauseOverlay.classList.add('hidden');
+  startOverlay.classList.add('hidden');
+  gameoverOverlay.classList.add('hidden');
+  pauseOverlay.classList.add('hidden');
 
-      btnStart.disabled = true;
-      btnPause.disabled = false;
-      btnRestart.disabled = false;
+  btnStart.disabled = true;
+  btnPause.disabled = false;
+  btnRestart.disabled = false;
 
-      resizeCanvas();
-      lastTime = performance.now();
-      cancelAnimationFrame(animFrameId);
-      animFrameId = requestAnimationFrame(gameLoop);
-    }
+  resizeCanvas();
+
+  // 이전 애니메이션 프레임 취소 및 타임스탬프 리셋
+  cancelAnimationFrame(animFrameId);
+  lastTime = 0; // 0으로 리셋하여 첫 gameLoop 프레임에서 dt가 0으로 안전하게 시작됨
+  animFrameId = requestAnimationFrame(gameLoop);
+}
 
     function pauseGame() {
       if (gameState !== STATE.PLAYING) return;
@@ -1093,7 +1056,6 @@
       gameoverOverlay.classList.remove('hidden');
     }
 
-    // Event Listeners
     document.getElementById('overlay-start-btn').addEventListener('click', startGame);
     document.getElementById('overlay-restart-btn').addEventListener('click', startGame);
     document.getElementById('overlay-resume-btn').addEventListener('click', resumeGame);
