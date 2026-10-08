@@ -2,75 +2,1107 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>이다은 테스트용 게임 이름</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>이다은 바이브코딩 해커톤</title>
+  <!-- Tailwind CSS for modern responsive visual layout -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Phosphor Icons for UI controls -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <style>
-    * { box-sizing: border-box; }
-    body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px; background: #eef1eb; color: #17241c; font-family: system-ui, "Malgun Gothic", sans-serif; }
-    main { width: min(100%, 720px); padding: clamp(24px, 5vw, 48px); border: 1px solid #00462a; border-radius: 8px; background: white; }
-    .label { margin: 0 0 24px; color: #00462a; font-size: 14px; font-weight: 700; }
-    h1 { margin: 0 0 16px; font-size: clamp(28px, 6vw, 42px); }
-    p { line-height: 1.7; }
-    #stage { display: grid; place-items: center; min-height: 180px; margin: 28px 0 20px; padding: 24px; background: #f3f5f1; border: 1px solid #d8ded7; text-align: center; }
-    #message { margin: 0; }
-    .buttons { display: flex; flex-wrap: wrap; gap: 12px; }
-    button { padding: 12px 20px; border: 1px solid #00462a; border-radius: 4px; background: #00462a; color: white; font: inherit; cursor: pointer; }
-    #restart { background: white; color: #00462a; }
-    button:disabled { opacity: .4; cursor: default; }
-    button:focus-visible { outline: 3px solid #69a58c; outline-offset: 4px; }
-    .guide { margin-top: 28px; padding: 24px; border: 1px solid #d8ded7; background: #f8faf6; }
-    .guide h2 { margin: 0 0 12px; font-size: 22px; }
-    .guide li { margin: 10px 0; line-height: 1.7; }
-    .sheet-link { display: inline-block; margin-top: 8px; padding: 12px 18px; background: #00462a; color: white; border-radius: 4px; text-decoration: none; }
-    .sheet-link:focus-visible { outline: 3px solid #69a58c; outline-offset: 4px; }
-    .note { margin-top: 28px; padding-top: 20px; border-top: 1px solid #d8ded7; color: #68746b; font-size: 14px; }
+    * { box-sizing: border-box; touch-action: manipulation; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: #eef1eb;
+      color: #17241c;
+      font-family: system-ui, -apple-system, "Malgun Gothic", sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .main-container {
+      width: min(100%, 760px);
+      padding: clamp(16px, 4vw, 36px);
+      border: 1px solid #00462a;
+      border-radius: 16px;
+      background: #ffffff;
+      box-shadow: 0 10px 30px rgba(0, 70, 42, 0.08);
+    }
+
+    .brand-tag {
+      color: #00462a;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .btn-primary {
+      background-color: #00462a;
+      color: #ffffff;
+      transition: all 0.2s ease;
+    }
+    .btn-primary:hover:not(:disabled) {
+      background-color: #00321e;
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background-color: #ffffff;
+      color: #00462a;
+      border: 1px solid #00462a;
+      transition: all 0.2s ease;
+    }
+    .btn-secondary:hover:not(:disabled) {
+      background-color: #f3f5f1;
+      transform: translateY(-1px);
+    }
+
+    #canvas-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      max-height: 480px;
+      background: #f3f5f1;
+      border: 2px solid #00462a;
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: crosshair;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .overlay-screen {
+      position: absolute;
+      inset: 0;
+      background: rgba(238, 241, 235, 0.94);
+      backdrop-filter: blur(4px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      z-index: 10;
+      transition: opacity 0.3s ease;
+    }
+
+    .pulse-glow {
+      animation: pulseGlow 2s infinite alternate;
+    }
+
+    @keyframes pulseGlow {
+      0% { box-shadow: 0 0 10px rgba(0,70,42,0.2); }
+      100% { box-shadow: 0 0 22px rgba(0,70,42,0.5); }
+    }
+
+    .shake-anim {
+      animation: shake 0.4s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: scale(1); }
+      20%, 60% { transform: translateX(-6px) scale(1.02); color: #ef4444; }
+      40%, 80% { transform: translateX(6px) scale(1.02); }
+    }
   </style>
 </head>
 <body>
-  <main>
-    <p class="label">KING · 바이브코딩 해커톤</p>
-    <!-- 사전 수정 연습: 아래 제목을 원하는 문구로 바꿔 보세요. -->
-    <h1>해커톤 준비 완료</h1>
-    <p>이 화면이 GitHub Pages 공개 주소에서 보이면 배포에 성공한 것입니다.<br>시작 버튼을 눌러 기본 동작도 확인해 주세요.</p>
-    <section id="stage" aria-label="실행 확인 화면" aria-live="polite">
-      <p id="message">시작 버튼을 눌러 주세요.</p>
+  <main class="main-container">
+    <!-- Header -->
+    <header class="mb-4 text-center sm:text-left flex flex-col sm:flex-row justify-between items-center border-b border-emerald-900/10 pb-3 gap-2">
+      <div>
+        <p class="brand-tag text-xs uppercase">KING · 바이브코딩 해커톤</p>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-[#00462a] mt-0.5">민첩한 하루가 되셨나요?</h1>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="sound-toggle" class="btn-secondary text-sm px-3 py-1.5 rounded-lg flex items-center gap-1.5">
+          <i class="ph ph-speaker-high text-lg" id="sound-icon"></i>
+          <span id="sound-label" class="hidden sm:inline">사운드 ON</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Score Dashboard -->
+    <section class="grid grid-cols-4 gap-2 mb-3 bg-[#f3f5f1] p-2.5 rounded-xl border border-[#d8ded7] text-center font-bold">
+      <div class="p-1">
+        <span class="text-xs text-gray-500 block uppercase">점수</span>
+        <span id="score-val" class="text-lg sm:text-2xl text-[#00462a]">0</span>
+      </div>
+      <div class="p-1">
+        <span class="text-xs text-gray-500 block uppercase">콤보</span>
+        <span id="combo-val" class="text-lg sm:text-2xl text-amber-600">0x</span>
+      </div>
+      <div class="p-1">
+        <span class="text-xs text-gray-500 block uppercase">최고 점수</span>
+        <span id="highscore-val" class="text-lg sm:text-2xl text-emerald-800">0</span>
+      </div>
+      <div class="p-1">
+        <span class="text-xs text-gray-500 block uppercase">체력</span>
+        <div id="lives-val" class="text-base sm:text-xl text-red-500 flex justify-center gap-0.5 mt-1">
+          <span>❤️</span><span>❤️</span><span>❤️</span>
+        </div>
+      </div>
     </section>
-    <div class="buttons">
-      <button id="start" type="button">시작</button>
-      <button id="restart" type="button" disabled>다시 시작</button>
+
+    <!-- Canvas Stage -->
+    <div id="canvas-wrapper" class="pulse-glow">
+      <canvas id="gameCanvas"></canvas>
+
+      <!-- Start Overlay -->
+      <div id="start-overlay" class="overlay-screen">
+        <div class="text-5xl mb-3">🙋‍♂️📱</div>
+        <h2 class="text-2xl sm:text-3xl font-bold text-[#00462a] mb-2">폰을 떨어트렸다!</h2>
+        <p class="text-gray-600 text-sm sm:text-base max-w-md mb-6 leading-relaxed">
+          두 팔을 벌린 사람을 조작해 스마트폰을 주우세요!<br>
+          ⏰ <b>시계</b>를 주의하고, 💥 <b>고장난 폰</b>을 피하세요!
+        </p>
+        <button id="overlay-start-btn" class="btn-primary px-8 py-3.5 rounded-xl font-bold text-lg shadow-lg hover:scale-105 active:scale-95">
+          게임 시작하기 🚀
+        </button>
+      </div>
+
+      <!-- Game Over Overlay -->
+      <div id="gameover-overlay" class="overlay-screen hidden">
+        <div id="grade-badge" class="text-6xl mb-2">🏆</div>
+        <h2 id="grade-title" class="text-2xl sm:text-3xl font-extrabold text-[#00462a] mb-1">민첩성 평가 중...</h2>
+        <p id="grade-desc" class="text-gray-600 font-medium text-sm sm:text-base mb-4">당신의 반응속도는 과연 몇 등급일까요?</p>
+        
+        <div class="bg-white border border-[#d8ded7] rounded-xl p-3 mb-6 w-full max-w-xs text-left text-sm space-y-1.5 shadow-sm">
+          <div class="flex justify-between">
+            <span class="text-gray-500">최종 점수:</span>
+            <span id="final-score" class="font-bold text-[#00462a]">0점</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">최대 콤보:</span>
+            <span id="final-combo" class="font-bold text-amber-600">0회</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">캐치 성공:</span>
+            <span id="final-caught" class="font-bold text-emerald-700"><span id="final-caught-count">0</span>개</span>
+          </div>
+          <div class="flex justify-between border-t border-gray-100 pt-1 text-red-600 font-semibold" id="fail-reason-row">
+            <span>종료 사유:</span>
+            <span id="fail-reason">체력 소진</span>
+          </div>
+        </div>
+
+        <div class="flex gap-3">
+          <button id="overlay-restart-btn" class="btn-primary px-6 py-3 rounded-xl font-bold text-base shadow">
+            다시 도전 🔄
+          </button>
+        </div>
+      </div>
+
+      <!-- Pause Overlay -->
+      <div id="pause-overlay" class="overlay-screen hidden">
+        <div class="text-5xl mb-2">⏸️</div>
+        <h2 class="text-2xl font-bold text-[#00462a] mb-4">일시 정지</h2>
+        <button id="overlay-resume-btn" class="btn-primary px-6 py-2.5 rounded-xl font-bold">
+          계속하기 ▶️
+        </button>
+      </div>
     </div>
-    <section class="guide" aria-labelledby="guide-title">
-      <h2 id="guide-title">참가자 정보 사전 입력</h2>
-      <p>정기 모임 전에 GitHub와 Skeam 계정을 만들고, 아래 스프레드시트에 본인 정보를 미리 기재해 주세요.</p>
-      <ol>
-        <li><strong>GitHub 계정:</strong> 계정을 생성하고 이메일 인증을 완료합니다. 공개 저장소를 만들고 이 파일을 GitHub Pages에 배포해 봅니다.</li>
-        <li><strong>Skeam 계정:</strong> 계정을 생성하고 행사에 사용할 기기에서 로그인을 확인합니다.</li>
-        <li><strong>스프레드시트:</strong> 빈 행 하나에 이름, Skeam 닉네임, 참여 여부, 사용할 AI·제작 도구를 입력합니다. 이미 본인 행이 있다면 해당 행을 수정합니다.</li>
-        <li><strong>행사 후 입력:</strong> 작품명과 Skeam 링크를 입력합니다. 아직 만들지 않은 작품 정보와 링크는 비워 두어도 됩니다.</li>
-      </ol>
-      <a class="sheet-link" href="https://docs.google.com/spreadsheets/d/1eLqrOtpMhR3VfCOIV-9_RNtlB1wUtHm_m6aK4ziDUH8/edit?usp=sharing" target="_blank" rel="noopener noreferrer">참가자 정보 입력 시트 열기 ↗</a>
-      <p style="font-size:14px;color:#68746b">다른 참가자의 행은 수정하지 마세요. 비밀번호·API 키는 기재하지 않습니다. 사전 준비·출석·제출 상태·실행 확인은 운영진이 관리합니다.</p>
+
+    <!-- Controls Row -->
+    <div class="flex flex-wrap items-center justify-between gap-3 mt-4">
+      <div class="flex gap-2">
+        <button id="btn-start" class="btn-primary px-5 py-2.5 rounded-lg font-bold text-sm shadow-sm flex items-center gap-1.5">
+          <i class="ph ph-play"></i> 시작
+        </button>
+        <button id="btn-pause" class="btn-secondary px-4 py-2.5 rounded-lg font-bold text-sm flex items-center gap-1.5" disabled>
+          <i class="ph ph-pause"></i> 정지
+        </button>
+        <button id="btn-restart" class="btn-secondary px-4 py-2.5 rounded-lg font-bold text-sm flex items-center gap-1.5" disabled>
+          <i class="ph ph-arrows-counter-clockwise"></i> 재시작
+        </button>
+      </div>
+
+      <div class="text-xs text-gray-500 font-medium flex items-center gap-2">
+        <span class="bg-gray-100 border border-gray-300 px-2 py-1 rounded">⌨️ 방향키 / A,D</span>
+        <span class="bg-gray-100 border border-gray-300 px-2 py-1 rounded">🖱️/👆 드래그 조작</span>
+      </div>
+    </div>
+
+    <!-- Mobile Touch Buttons -->
+    <div class="sm:hidden grid grid-cols-2 gap-3 mt-3">
+      <button id="touch-left" class="btn-secondary py-3 rounded-xl text-center font-bold text-lg active:bg-emerald-100">
+        ◀️ 왼쪽 이동
+      </button>
+      <button id="touch-right" class="btn-secondary py-3 rounded-xl text-center font-bold text-lg active:bg-emerald-100">
+        오른쪽 이동 ▶️
+      </button>
+    </div>
+
+    <!-- Rule & Guide Section -->
+    <section class="guide mt-6 p-5 border border-[#d8ded7] rounded-xl bg-[#f8faf6] text-sm">
+      <h2 class="font-bold text-lg text-[#00462a] mb-2 flex items-center gap-2">
+        <i class="ph ph-info"></i> 게임 규칙 & 업데이트 아이템 안내
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-gray-700">
+        <ul class="space-y-1.5 list-disc list-inside">
+          <li>📱 <b>일반 휴대폰:</b> +10점 및 콤보 획득</li>
+          <li>✨ <b>빛의 속도로:</b> +30점 보너스!</li>
+          <li>⏰ <b>시계 :</b> 5초간 <u>패스트 모션 (속도 1.8배)</u> 발동</li>
+        </ul>
+        <ul class="space-y-1.5 list-disc list-inside">
+          <li>🎧 <b>꼬인 이어폰:</b> -50점 감점 & 콤보 리셋</li>
+          <li>💥 <b>휴대폰 고장:</b> ⚠️ <u>잡는 순간 즉시 게임 오버</u></li>
+          <li>❤️ 일반 휴대폰을 땅에 떨어뜨릴 시 체력 차감</li>
+        </ul>
+      </div>
     </section>
-    <p class="note">이 파일은 배포 연습용 기본 틀입니다. 실제 게임 규칙과 조작은 당일 추가하세요.<br>사전 연습: 제목을 수정해 다시 올린 뒤 공개 페이지에도 반영되는지 확인합니다.</p>
   </main>
+
   <script>
-    // 외부 라이브러리 없이 이 파일 하나로 실행됩니다.
-    const message = document.getElementById('message');
-    const start = document.getElementById('start');
-    const restart = document.getElementById('restart');
-    start.addEventListener('click', () => {
-      message.textContent = '시작 버튼이 정상적으로 작동합니다. 다시 시작 버튼도 확인해 주세요.';
-      start.disabled = true;
-      restart.disabled = false;
-      restart.focus();
+    // Web Audio Synthesizer for procedural SFX
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.enabled = true;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) this.ctx = new AudioCtx();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      playCatch() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(523.25, this.ctx.currentTime); // C5
+        osc.frequency.exponentialRampToValueAtTime(880, this.ctx.currentTime + 0.1); // A5
+
+        gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.1);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.1);
+      }
+
+      playGolden() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+
+        [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime + idx * 0.03);
+          
+          gain.gain.setValueAtTime(0.2, this.ctx.currentTime + idx * 0.03);
+          gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + idx * 0.03 + 0.12);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(this.ctx.currentTime + idx * 0.03);
+          osc.stop(this.ctx.currentTime + idx * 0.03 + 0.12);
+        });
+      }
+
+      playFastMotion() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(300, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(900, this.ctx.currentTime + 0.25);
+
+        gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.25);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.25);
+      }
+
+      playEarphonePenalty() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(220, this.ctx.currentTime);
+        osc.frequency.setValueAtTime(150, this.ctx.currentTime + 0.1);
+
+        gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.2);
+      }
+
+      playExplosion() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(120, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(30, this.ctx.currentTime + 0.4);
+
+        gain.gain.setValueAtTime(0.35, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.4);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.4);
+      }
+    }
+
+    const sounds = new SoundEngine();
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const canvasWrapper = document.getElementById('canvas-wrapper');
+
+    const scoreVal = document.getElementById('score-val');
+    const comboVal = document.getElementById('combo-val');
+    const highscoreVal = document.getElementById('highscore-val');
+    const livesVal = document.getElementById('lives-val');
+
+    const startOverlay = document.getElementById('start-overlay');
+    const gameoverOverlay = document.getElementById('gameover-overlay');
+    const pauseOverlay = document.getElementById('pause-overlay');
+
+    const btnStart = document.getElementById('btn-start');
+    const btnPause = document.getElementById('btn-pause');
+    const btnRestart = document.getElementById('btn-restart');
+
+    const soundToggle = document.getElementById('sound-toggle');
+    const soundIcon = document.getElementById('sound-icon');
+    const soundLabel = document.getElementById('sound-label');
+
+    const STATE = { IDLE: 0, PLAYING: 1, PAUSED: 2, GAMEOVER: 3 };
+    let gameState = STATE.IDLE;
+
+    let score = 0;
+    let combo = 0;
+    let maxCombo = 0;
+    let caughtCount = 0;
+    let lives = 3;
+    let highScore = localStorage.getItem('agility_game_highscore') || 0;
+    highscoreVal.textContent = highScore;
+
+    let animFrameId = null;
+    let lastTime = 0;
+    let spawnTimer = 0;
+    let spawnInterval = 900;
+    let fastMotionTimeLeft = 0;
+    let failReasonText = '체력 소진';
+
+    const keys = { left: false, right: false };
+
+    // Human player state
+    const player = {
+      x: 0,
+      y: 0,
+      width: 64,   // width of arms outstretched catch zone
+      height: 72,  // human character height
+      speed: 550,
+      facing: 'center', // 'left', 'right', 'center'
+      animFrame: 0,
+      glow: 0
+    };
+
+    // Falling Item Specifications
+    const ITEM_TYPES = {
+      PHONE: { type: 'PHONE', emoji: '📱', score: 10, weight: 55, speed: 500, isHazard: false },
+      GOLDEN: { type: 'GOLDEN', emoji: '✨', score: 30, weight: 15, speed: 600, isHazard: false },
+      CLOCK: { type: 'CLOCK', emoji: '⏰', score: 10, weight: 12, speed: 300, isHazard: false },
+      EARPHONES: { type: 'EARPHONES', emoji: '🎧', score: -50, weight: 12, speed: 400, isHazard: true },
+      BROKEN_PHONE: { type: 'BROKEN_PHONE', emoji: '📱', bonusEmoji: '💥', score: 0, weight: 6, speed: 300, isHazard: true, instantDeath: true }
+    };
+
+    let items = [];
+    let particles = [];
+    let floatingTexts = [];
+
+    function createParticles(x, y, color, count = 8) {
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 140 + 40;
+        particles.push({
+          x: x,
+          y: y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          radius: Math.random() * 4 + 2,
+          color: color,
+          alpha: 1,
+          life: 0.5
+        });
+      }
+    }
+
+    function createFloatingText(x, y, text, color = '#00462a') {
+      floatingTexts.push({
+        x: x,
+        y: y,
+        text: text,
+        color: color,
+        alpha: 1,
+        vy: -70,
+        life: 0.95
+      });
+    }
+
+    function resizeCanvas() {
+      const rect = canvasWrapper.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      
+      ctx.scale(dpr, dpr);
+      
+      player.width = 64;
+      player.height = 76;
+      player.y = rect.height - player.height - 8;
+      
+      if (gameState === STATE.IDLE) {
+        player.x = rect.width / 2 - player.width / 2;
+      } else {
+        player.x = Math.max(0, Math.min(rect.width - player.width, player.x));
+      }
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+
+    // Keyboard controls
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = true;
+      if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = true;
+      if (e.key === ' ' || e.key === 'Spacebar') {
+        if (gameState === STATE.PLAYING) pauseGame();
+        else if (gameState === STATE.PAUSED) resumeGame();
+      }
     });
-    restart.addEventListener('click', () => {
-      message.textContent = '시작 버튼을 눌러 주세요.';
-      start.disabled = false;
-      restart.disabled = true;
-      start.focus();
+
+    window.addEventListener('keyup', (e) => {
+      if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = false;
+      if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = false;
+    });
+
+    // Mouse / Touch direct tracking
+    function handlePointerMove(clientX) {
+      if (gameState !== STATE.PLAYING) return;
+      const rect = canvasWrapper.getBoundingClientRect();
+      const relativeX = clientX - rect.left;
+      const newX = Math.max(0, Math.min(rect.width - player.width, relativeX - player.width / 2));
+      
+      if (newX < player.x - 2) player.facing = 'left';
+      else if (newX > player.x + 2) player.facing = 'right';
+      else player.facing = 'center';
+
+      player.x = newX;
+    }
+
+    canvasWrapper.addEventListener('mousemove', (e) => handlePointerMove(e.clientX));
+    canvasWrapper.addEventListener('touchmove', (e) => {
+      if (e.touches.length > 0) handlePointerMove(e.touches[0].clientX);
+    }, { passive: true });
+
+    // Touch Buttons
+    const btnTouchLeft = document.getElementById('touch-left');
+    const btnTouchRight = document.getElementById('touch-right');
+
+    const handleTouchBtn = (direction, isPressed) => {
+      if (direction === 'left') keys.left = isPressed;
+      if (direction === 'right') keys.right = isPressed;
+    };
+
+    btnTouchLeft.addEventListener('touchstart', (e) => { e.preventDefault(); handleTouchBtn('left', true); });
+    btnTouchLeft.addEventListener('touchend', (e) => { e.preventDefault(); handleTouchBtn('left', false); });
+    btnTouchRight.addEventListener('touchstart', (e) => { e.preventDefault(); handleTouchBtn('right', true); });
+    btnTouchRight.addEventListener('touchend', (e) => { e.preventDefault(); handleTouchBtn('right', false); });
+
+    function getRandomItemType() {
+      const totalWeight = Object.values(ITEM_TYPES).reduce((acc, curr) => acc + curr.weight, 0);
+      let rand = Math.random() * totalWeight;
+
+      for (const item of Object.values(ITEM_TYPES)) {
+        if (rand < item.weight) return item;
+        rand -= item.weight;
+      }
+      return ITEM_TYPES.PHONE;
+    }
+
+    function spawnItem() {
+      const rect = canvasWrapper.getBoundingClientRect();
+      const itemType = getRandomItemType();
+      const size = 36;
+      const x = Math.random() * (rect.width - size - 24) + 12;
+
+      items.push({
+        ...itemType,
+        x: x,
+        y: -size,
+        size: size,
+        rotation: (Math.random() - 0.5) * 0.3,
+        rotSpeed: (Math.random() - 0.5) * 3,
+        speedMultiplier: 0.95 + Math.random() * 0.25
+      });
+    }
+
+    function update(dt) {
+      if (gameState !== STATE.PLAYING) return;
+
+      const rect = canvasWrapper.getBoundingClientRect();
+
+      // Determine active game speed (Fast Motion vs normal speed ramping)
+      let currentSpeedMultiplier = 1 + Math.min(score / 350, 0.8);
+      if (fastMotionTimeLeft > 0) {
+        fastMotionTimeLeft -= dt;
+        currentSpeedMultiplier *= 1.3; // 1.8x Fast Motion speed!
+      }
+
+      // Player Controls & Facing direction
+      if (keys.left) {
+        player.x -= player.speed * dt;
+        player.facing = 'left';
+        player.animFrame += dt * 10;
+      } else if (keys.right) {
+        player.x += player.speed * dt;
+        player.facing = 'right';
+        player.animFrame += dt * 10;
+      } else {
+        player.facing = 'center';
+        player.animFrame = 0;
+      }
+      player.x = Math.max(0, Math.min(rect.width - player.width, player.x));
+
+      if (player.glow > 0) player.glow -= dt * 3;
+
+      // Spawning loop
+      spawnTimer += dt * 1000;
+      const currentInterval = Math.max(300, spawnInterval / currentSpeedMultiplier);
+      if (spawnTimer >= currentInterval) {
+        spawnItem();
+        spawnTimer = 0;
+      }
+
+      // Items movement & collisions
+      for (let i = items.length - 1; i >= 0; i--) {
+        const item = items[i];
+        const effectiveSpeed = item.speed * item.speedMultiplier * currentSpeedMultiplier;
+        item.y += effectiveSpeed * dt;
+        item.rotation += item.rotSpeed * dt;
+
+        // Player catch hands collision box
+        const playerBox = {
+          left: player.x - 4,
+          right: player.x + player.width + 4,
+          top: player.y,
+          bottom: player.y + 35 // Catch hands height zone
+        };
+
+        const itemBox = {
+          left: item.x,
+          right: item.x + item.size,
+          top: item.y,
+          bottom: item.y + item.size
+        };
+
+        const isColliding = (
+          itemBox.right >= playerBox.left &&
+          itemBox.left <= playerBox.right &&
+          itemBox.bottom >= playerBox.top &&
+          itemBox.top <= playerBox.bottom
+        );
+
+        if (isColliding) {
+          handleItemCatch(item);
+          items.splice(i, 1);
+          continue;
+        }
+
+        // Missed item reaches bottom
+        if (item.y > rect.height) {
+          if (!item.isHazard && item.type === 'PHONE') {
+            combo = 0;
+            updateComboUI();
+            takeDamage('휴대폰 놓침!');
+            sounds.playEarphonePenalty();
+          }
+          items.splice(i, 1);
+        }
+      }
+
+      // Update Particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.alpha -= dt / p.life;
+        if (p.alpha <= 0) particles.splice(i, 1);
+      }
+
+      // Update Floating Texts
+      for (let i = floatingTexts.length - 1; i >= 0; i--) {
+        const ft = floatingTexts[i];
+        ft.y += ft.vy * dt;
+        ft.alpha -= dt / ft.life;
+        if (ft.alpha <= 0) floatingTexts.splice(i, 1);
+      }
+    }
+
+    function handleItemCatch(item) {
+      const centerX = item.x + item.size / 2;
+      const centerY = item.y + item.size / 2;
+
+      player.glow = 1;
+
+      // 1. Broken Phone -> INSTANT GAME OVER!
+      if (item.instantDeath) {
+        createParticles(centerX, centerY, '#dc2626', 20);
+        createFloatingText(centerX, centerY, '고장난 폰! GAME OVER!', '#dc2626');
+        sounds.playExplosion();
+        failReasonText = '고장난 휴대폰 피격! 📱💥';
+        gameOver();
+        return;
+      }
+
+      // 2. Earphones -> Penalty
+      if (item.type === 'EARPHONES') {
+        combo = 0;
+        updateComboUI();
+        score = Math.max(0, score + item.score);
+        scoreVal.textContent = score;
+
+        createParticles(centerX, centerY, '#6b7280', 12);
+        createFloatingText(centerX, centerY, '-50점! 이어폰 꼬임 🎧', '#ef4444');
+        sounds.playEarphonePenalty();
+        return;
+      }
+
+      // 3. Clock -> Fast Motion
+      if (item.type === 'CLOCK') {
+        fastMotionTimeLeft = 5.0; // 5 seconds of fast motion!
+        score += item.score;
+        scoreVal.textContent = score;
+
+        createParticles(centerX, centerY, '#ef4444', 16);
+        createFloatingText(centerX, centerY, 'FAST MOTION ⚡ (속도 1.8x)', '#d97706');
+        sounds.playFastMotion();
+        return;
+      }
+
+      // 4. Normal / Golden Phones
+      caughtCount++;
+      combo++;
+      if (combo > maxCombo) maxCombo = combo;
+      updateComboUI();
+
+      let earnedScore = item.score;
+      if (combo >= 5) earnedScore += Math.floor(combo * 1.5);
+
+      score += earnedScore;
+      scoreVal.textContent = score;
+
+      if (score > highScore) {
+        highScore = score;
+        highscoreVal.textContent = highScore;
+        localStorage.setItem('agility_game_highscore', highScore);
+      }
+
+      if (item.type === 'GOLDEN') {
+        createParticles(centerX, centerY, '#f59e0b', 18);
+        createFloatingText(centerX, centerY, `+${earnedScore} ✨`, '#b45309');
+        sounds.playGolden();
+      } else {
+        createParticles(centerX, centerY, '#00462a', 8);
+        const comboText = combo >= 3 ? ` (${combo}x)` : '';
+        createFloatingText(centerX, centerY, `+${earnedScore}${comboText}`, '#00462a');
+        sounds.playCatch();
+      }
+    }
+
+    function takeDamage(reason) {
+      lives--;
+      renderLivesUI();
+
+      canvasWrapper.classList.add('shake-anim');
+      setTimeout(() => canvasWrapper.classList.remove('shake-anim'), 400);
+
+      if (lives <= 0) {
+        failReasonText = '체력 소진 (휴대폰 3회 놓침)';
+        gameOver();
+      }
+    }
+
+    function updateComboUI() {
+      comboVal.textContent = `${combo}x`;
+      if (combo >= 5) {
+        comboVal.className = 'text-lg sm:text-2xl text-amber-500 font-extrabold animate-bounce';
+      } else {
+        comboVal.className = 'text-lg sm:text-2xl text-amber-600 font-bold';
+      }
+    }
+
+    function renderLivesUI() {
+      let hearts = '';
+      for (let i = 0; i < 3; i++) {
+        hearts += (i < lives) ? '❤️' : '🖤';
+      }
+      livesVal.innerHTML = hearts;
+    }
+
+    function drawHumanPlayer(x, y, width, height) {
+      ctx.save();
+      ctx.translate(x + width / 2, y + height);
+
+      const isLeft = player.facing === 'left';
+      const isRight = player.facing === 'right';
+      const legOffset = Math.sin(player.animFrame) * 6;
+
+      // Glow effect on catching
+      if (player.glow > 0) {
+        ctx.shadowColor = '#10b981';
+        ctx.shadowBlur = 16 * player.glow;
+      }
+
+      // Legs / Pants
+      ctx.fillStyle = '#1e293b';
+      // Left leg
+      ctx.beginPath();
+      ctx.roundRect(-14, -22 + (isLeft ? legOffset : 0), 10, 22, 4);
+      ctx.fill();
+      // Right leg
+      ctx.beginPath();
+      ctx.roundRect(4, -22 + (isRight ? -legOffset : 0), 10, 22, 4);
+      ctx.fill();
+
+      // Shoes
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(-16, -4 + (isLeft ? legOffset : 0), 12, 5);
+      ctx.fillRect(4, -4 + (isRight ? -legOffset : 0), 12, 5);
+
+      // Shirt / Body
+      ctx.fillStyle = '#00462a';
+      ctx.beginPath();
+      ctx.roundRect(-18, -50, 36, 30, 6);
+      ctx.fill();
+
+      // Shirt collar accent
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.moveTo(-6, -50);
+      ctx.lineTo(0, -42);
+      ctx.lineTo(6, -50);
+      ctx.fill();
+
+      // Head
+      ctx.fillStyle = '#fde047'; // skin tone / warm tone
+      ctx.beginPath();
+      ctx.arc(0, -62, 14, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Hair
+      ctx.fillStyle = '#27272a';
+      ctx.beginPath();
+      ctx.arc(0, -66, 14, Math.PI, Math.PI * 2);
+      ctx.fill();
+
+      // Eyes (looking UP at falling phones!)
+      ctx.fillStyle = '#000000';
+      ctx.beginPath();
+      ctx.arc(-5, -65, 2.5, 0, Math.PI * 2);
+      ctx.arc(5, -65, 2.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Open smile face
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(0, -60, 4, 0, Math.PI);
+      ctx.stroke();
+
+      // Outstretched Arms (ready to catch)
+      ctx.strokeStyle = '#00462a';
+      ctx.lineWidth = 7;
+      ctx.lineCap = 'round';
+
+      // Left Arm up
+      ctx.beginPath();
+      ctx.moveTo(-16, -44);
+      ctx.lineTo(-28, -62);
+      ctx.stroke();
+
+      // Right Arm up
+      ctx.beginPath();
+      ctx.moveTo(16, -44);
+      ctx.lineTo(28, -62);
+      ctx.stroke();
+
+      // Open Hands
+      ctx.fillStyle = '#fde047';
+      ctx.beginPath();
+      ctx.arc(-29, -64, 5, 0, Math.PI * 2);
+      ctx.arc(29, -64, 5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function render() {
+      const rect = canvasWrapper.getBoundingClientRect();
+      ctx.clearRect(0, 0, rect.width, rect.height);
+
+      // Background Grid
+      ctx.fillStyle = '#f3f5f1';
+      ctx.fillRect(0, 0, rect.width, rect.height);
+
+      ctx.strokeStyle = '#e5eae2';
+      ctx.lineWidth = 1;
+      const gridSize = 40;
+      for (let x = 0; x < rect.width; x += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, rect.height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < rect.height; y += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(rect.width, y);
+        ctx.stroke();
+      }
+
+      // Fast Motion visual banner
+      if (fastMotionTimeLeft > 0) {
+        ctx.fillStyle = 'rgba(239, 68, 68, 0.08)';
+        ctx.fillRect(0, 0, rect.width, rect.height);
+
+        // Speed Lines
+        ctx.strokeStyle = 'rgba(239, 68, 68, 0.25)';
+        ctx.lineWidth = 2;
+        for (let i = 0; i < 5; i++) {
+          const lx = (Date.now() * 0.8 + i * 90) % rect.width;
+          ctx.beginPath();
+          ctx.moveTo(lx, 0);
+          ctx.lineTo(lx, rect.height);
+          ctx.stroke();
+        }
+
+        ctx.font = 'bold 13px sans-serif';
+        ctx.fillStyle = '#dc2626';
+        ctx.textAlign = 'right';
+        ctx.fillText(`⚡ 패스트 모션! (${fastMotionTimeLeft.toFixed(1)}s)`, rect.width - 12, 24);
+      }
+
+      // Draw Falling Items
+      items.forEach(item => {
+        ctx.save();
+        ctx.translate(item.x + item.size / 2, item.y + item.size / 2);
+        ctx.rotate(item.rotation);
+
+        if (item.type === 'GOLDEN') {
+          ctx.shadowColor = '#f59e0b';
+          ctx.shadowBlur = 14;
+        } else if (item.type === 'BROKEN_PHONE') {
+          ctx.shadowColor = '#ef4444';
+          ctx.shadowBlur = 12;
+        }
+
+        ctx.font = `${item.size}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(item.emoji, 0, 0);
+
+        if (item.bonusEmoji) {
+          ctx.font = '16px sans-serif';
+          ctx.fillText(item.bonusEmoji, 14, -12);
+        }
+
+        ctx.restore();
+      });
+
+      // Draw Particles
+      particles.forEach(p => {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, p.alpha);
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+
+      // Draw Floating Text
+      floatingTexts.forEach(ft => {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, ft.alpha);
+        ctx.font = 'bold 16px system-ui, sans-serif';
+        ctx.fillStyle = ft.color;
+        ctx.textAlign = 'center';
+        ctx.fillText(ft.text, ft.x, ft.y);
+        ctx.restore();
+      });
+
+      // Draw Human Player Character
+      drawHumanPlayer(player.x, player.y, player.width, player.height);
+    }
+
+    function gameLoop(timestamp) {
+      if (!lastTime) lastTime = timestamp;
+      const dt = Math.min((timestamp - lastTime) / 1000, 0.1);
+      lastTime = timestamp;
+
+      update(dt);
+      render();
+
+      if (gameState === STATE.PLAYING) {
+        animFrameId = requestAnimationFrame(gameLoop);
+      }
+    }
+
+    function startGame() {
+      sounds.init();
+      score = 0;
+      combo = 0;
+      maxCombo = 0;
+      caughtCount = 0;
+      lives = 3;
+      spawnTimer = 0;
+      fastMotionTimeLeft = 0;
+      items = [];
+      particles = [];
+      floatingTexts = [];
+
+      scoreVal.textContent = '0';
+      comboVal.textContent = '0x';
+      renderLivesUI();
+
+      gameState = STATE.PLAYING;
+
+      startOverlay.classList.add('hidden');
+      gameoverOverlay.classList.add('hidden');
+      pauseOverlay.classList.add('hidden');
+
+      btnStart.disabled = true;
+      btnPause.disabled = false;
+      btnRestart.disabled = false;
+
+      resizeCanvas();
+      lastTime = performance.now();
+      cancelAnimationFrame(animFrameId);
+      animFrameId = requestAnimationFrame(gameLoop);
+    }
+
+    function pauseGame() {
+      if (gameState !== STATE.PLAYING) return;
+      gameState = STATE.PAUSED;
+      pauseOverlay.classList.remove('hidden');
+      btnPause.innerHTML = '<i class="ph ph-play"></i> 계속';
+    }
+
+    function resumeGame() {
+      if (gameState !== STATE.PAUSED) return;
+      gameState = STATE.PLAYING;
+      pauseOverlay.classList.add('hidden');
+      btnPause.innerHTML = '<i class="ph ph-pause"></i> 정지';
+      lastTime = performance.now();
+      animFrameId = requestAnimationFrame(gameLoop);
+    }
+
+    function gameOver() {
+      gameState = STATE.GAMEOVER;
+
+      btnStart.disabled = false;
+      btnPause.disabled = true;
+
+      let grade = 'C';
+      let title = '민첩성 C등급';
+      let desc = '변상해주세요';
+      let badge = '🐢';
+
+      if (score >= 450) {
+        title = '민첩성 SSS등급';
+        desc = '네 민첩한 하루 되세요';
+        badge = '⚡';
+      } else if (score >= 300) {
+        title = '민첩성 S등급';
+        desc = '순발력좀 키우셔서 담번에는 잡던가요';
+        badge = '🏆';
+      } else if (score >= 180) {
+        title = '민첩성 A등급';
+        desc = '알겠는데 하나만 짚고 갑시다';
+        badge = '🥇';
+      } else if (score >= 90) {
+        title = '민첩성 B등급';
+        desc = '진짜 다 맞는말인데 뭔가 재수없다 알겠어요';
+        badge = '🥈';
+      }
+
+      document.getElementById('grade-badge').textContent = badge;
+      document.getElementById('grade-title').textContent = title;
+      document.getElementById('grade-desc').textContent = desc;
+
+      document.getElementById('final-score').textContent = `${score}점`;
+      document.getElementById('final-combo').textContent = `${maxCombo}회`;
+      document.getElementById('final-caught-count').textContent = caughtCount;
+      document.getElementById('fail-reason').textContent = failReasonText;
+
+      gameoverOverlay.classList.remove('hidden');
+    }
+
+    // Event Listeners
+    document.getElementById('overlay-start-btn').addEventListener('click', startGame);
+    document.getElementById('overlay-restart-btn').addEventListener('click', startGame);
+    document.getElementById('overlay-resume-btn').addEventListener('click', resumeGame);
+
+    btnStart.addEventListener('click', startGame);
+    btnPause.addEventListener('click', () => {
+      if (gameState === STATE.PLAYING) pauseGame();
+      else if (gameState === STATE.PAUSED) resumeGame();
+    });
+    btnRestart.addEventListener('click', startGame);
+
+    soundToggle.addEventListener('click', () => {
+      sounds.enabled = !sounds.enabled;
+      if (sounds.enabled) {
+        soundIcon.className = 'ph ph-speaker-high text-lg';
+        soundLabel.textContent = '사운드 ON';
+      } else {
+        soundIcon.className = 'ph ph-speaker-slash text-lg';
+        soundLabel.textContent = '사운드 OFF';
+      }
+    });
+
+    window.addEventListener('load', () => {
+      resizeCanvas();
+      render();
     });
   </script>
 </body>
 </html>
-
