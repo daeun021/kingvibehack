@@ -130,10 +130,14 @@
     </header>
 
     <!-- Score Dashboard -->
-    <section class="grid grid-cols-4 gap-2 mb-3 bg-[#f3f5f1] p-2.5 rounded-xl border border-[#d8ded7] text-center font-bold">
+    <section class="grid grid-cols-5 gap-2 mb-3 bg-[#f3f5f1] p-2.5 rounded-xl border border-[#d8ded7] text-center font-bold">
       <div class="p-1">
         <span class="text-xs text-gray-500 block uppercase">점수</span>
         <span id="score-val" class="text-lg sm:text-2xl text-[#00462a]">0</span>
+      </div>
+      <div class="p-1">
+        <span class="text-xs text-gray-500 block uppercase">시간</span>
+        <span id="time-val" class="text-lg sm:text-2xl text-blue-600">30s</span>
       </div>
       <div class="p-1">
         <span class="text-xs text-gray-500 block uppercase">콤보</span>
@@ -421,6 +425,9 @@
     let fastMotionTimeLeft = 0;
     let failReasonText = '체력 소진';
 
+    const timeVal = document.getElementById('time-val');
+    let gameTime = 30; // 제한 시간 30초
+
     const keys = { left: false, right: false };
 
     // Human player state
@@ -578,6 +585,16 @@
       if (gameState !== STATE.PLAYING) return;
 
       const rect = canvasWrapper.getBoundingClientRect();
+
+      gameTime -= dt;
+      if (gameTime <= 0) {
+        gameTime = 0;
+        timeVal.textContent = '0s';
+        failReasonText = '30초 제한시간 종료! ⏱️';
+        gameOver();
+        return;
+      }
+      timeVal.textContent = `${Math.ceil(gameTime)}s`;
 
       // Determine active game speed (Fast Motion vs normal speed ramping)
       let currentSpeedMultiplier = 1 + Math.min(score / 350, 0.8);
