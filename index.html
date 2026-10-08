@@ -854,24 +854,71 @@
       const rect = canvasWrapper.getBoundingClientRect();
       ctx.clearRect(0, 0, rect.width, rect.height);
 
-      ctx.fillStyle = '#f3f5f1';
-      ctx.fillRect(0, 0, rect.width, rect.height);
+// 🏙️ 1. 도심 하늘 (그라데이션)
+const skyGradient = ctx.createLinearGradient(0, 0, 0, rect.height);
+skyGradient.addColorStop(0, '#bae6fd'); // 상단 연한 하늘색
+skyGradient.addColorStop(0.7, '#e0f2fe'); // 하단 밝은 하늘색
+ctx.fillStyle = skyGradient;
+ctx.fillRect(0, 0, rect.width, rect.height);
 
-      ctx.strokeStyle = '#e5eae2';
-      ctx.lineWidth = 1;
-      const gridSize = 40;
-      for (let x = 0; x < rect.width; x += gridSize) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, rect.height);
-        ctx.stroke();
-      }
-      for (let y = 0; y < rect.height; y += gridSize) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(rect.width, y);
-        ctx.stroke();
-      }
+// 🏢 2. 원경 빌딩 실루엣 (연한 건물들)
+ctx.fillStyle = '#cbd5e1';
+const bgBuildings = [
+  { x: 0, w: 0.15, h: 0.5 },
+  { x: 0.12, w: 0.18, h: 0.65 },
+  { x: 0.28, w: 0.14, h: 0.45 },
+  { x: 0.40, w: 0.22, h: 0.58 },
+  { x: 0.60, w: 0.16, h: 0.48 },
+  { x: 0.74, w: 0.18, h: 0.62 },
+  { x: 0.88, w: 0.15, h: 0.52 }
+];
+bgBuildings.forEach(b => {
+  const bx = b.x * rect.width;
+  const bw = b.w * rect.width;
+  const bh = b.h * rect.height;
+  ctx.fillRect(bx, rect.height - bh, bw, bh);
+});
+
+// 🏢 3. 근경 빌딩 실루엣 및 창문
+ctx.fillStyle = '#94a3b8';
+const fgBuildings = [
+  { x: 0.05, w: 0.16, h: 0.42 },
+  { x: 0.22, w: 0.20, h: 0.52 },
+  { x: 0.45, w: 0.15, h: 0.38 },
+  { x: 0.63, w: 0.22, h: 0.46 },
+  { x: 0.82, w: 0.15, h: 0.35 }
+];
+fgBuildings.forEach(b => {
+  const bx = b.x * rect.width;
+  const bw = b.w * rect.width;
+  const bh = b.h * rect.height;
+  const by = rect.height - bh;
+  ctx.fillRect(bx, by, bw, bh);
+
+  // 창문 그리기
+  ctx.fillStyle = '#fef08a'; // 노란 불빛 창문
+  for (let wx = bx + 6; wx < bx + bw - 10; wx += 12) {
+    for (let wy = by + 12; wy < rect.height - 50; wy += 18) {
+      ctx.fillRect(wx, wy, 6, 9);
+    }
+  }
+  ctx.fillStyle = '#94a3b8'; // 다음 건물을 위해 색상 복원
+});
+
+// 🛣️ 4. 보도블록 / 도로 바닥
+// 바닥 도로
+ctx.fillStyle = '#475569';
+ctx.fillRect(0, rect.height - 32, rect.width, 32);
+
+// 보도블록 연석 경계선
+ctx.fillStyle = '#cbd5e1';
+ctx.fillRect(0, rect.height - 36, rect.width, 4);
+
+// 도로 중앙 점선 (흰색)
+ctx.fillStyle = '#ffffff';
+for (let rx = 0; rx < rect.width; rx += 36) {
+  ctx.fillRect(rx, rect.height - 18, 20, 3);
+}
 
       if (fastMotionTimeLeft > 0) {
         ctx.fillStyle = 'rgba(239, 68, 68, 0.08)';
