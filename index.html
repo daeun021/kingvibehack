@@ -249,7 +249,7 @@
         <ul class="space-y-1.5 list-disc list-inside">
           <li>📱 <b>일반 휴대폰:</b> +10점 및 콤보 획득</li>
           <li>✨ <b>빛의 속도로:</b> +30점 보너스!</li>
-          <li>⏰ <b>시계 :</b> 5초간 <u>패스트 모션 (속도 1.8배)</u> 발동</li>
+          <li>⏰ <b>시계 :</b> 5초간 <u>속도 1.3배</u> 발동</li>
         </ul>
         <ul class="space-y-1.5 list-disc list-inside">
           <li>🎧 <b>꼬인 이어폰:</b> -50점 감점 & 콤보 리셋</li>
@@ -437,8 +437,8 @@
 
     // Falling Item Specifications
     const ITEM_TYPES = {
-      PHONE: { type: 'PHONE', emoji: '📱', score: 10, weight: 55, speed: 500, isHazard: false },
-      GOLDEN: { type: 'GOLDEN', emoji: '✨', score: 30, weight: 15, speed: 600, isHazard: false },
+      PHONE: { type: 'PHONE', emoji: '📱', score: 10, weight: 55, speed: 300, isHazard: false },
+      GOLDEN: { type: 'GOLDEN', emoji: '✨', score: 30, weight: 15, speed: 500, isHazard: false },
       CLOCK: { type: 'CLOCK', emoji: '⏰', score: 10, weight: 12, speed: 300, isHazard: false },
       EARPHONES: { type: 'EARPHONES', emoji: '🎧', score: -50, weight: 12, speed: 400, isHazard: true },
       BROKEN_PHONE: { type: 'BROKEN_PHONE', emoji: '📱', bonusEmoji: '💥', score: 0, weight: 6, speed: 300, isHazard: true, instantDeath: true }
@@ -712,7 +712,7 @@
         scoreVal.textContent = score;
 
         createParticles(centerX, centerY, '#ef4444', 16);
-        createFloatingText(centerX, centerY, 'FAST MOTION ⚡ (속도 1.8x)', '#d97706');
+        createFloatingText(centerX, centerY, 'FAST MOTION ⚡ (속도 1.3x)', '#d97706');
         sounds.playFastMotion();
         return;
       }
